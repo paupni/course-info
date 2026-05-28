@@ -25,11 +25,11 @@ public class CourseRetrievalService {
 
         try {
             HttpResponse<String> apiResponse = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
-            int status = apiResponse.statusCode();
-            if (status >= 200 && status < 300) {
-                return apiResponse.body();
-            }
-            throw new RuntimeException("Failed to retrieve courses: HTTP " + status + " - " + apiResponse.body());
+            return switch (apiResponse.statusCode()) {
+                case 200 -> apiResponse.body();
+                case 404 -> throw new RuntimeException("Author not found: " + authorId);
+                default -> throw new RuntimeException("Failed to retrieve courses: HTTP " + apiResponse.statusCode() + " - " + apiResponse.body());
+            };
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Request interrupted while retrieving courses for author: " + authorId, e);
