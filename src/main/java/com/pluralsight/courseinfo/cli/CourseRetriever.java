@@ -1,23 +1,33 @@
 package com.pluralsight.courseinfo.cli;
 
+import com.pluralsight.courseinfo.cli.service.CourseRetrievalService;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
+
 public class CourseRetriever {
+    private static final Logger LOG = LoggerFactory.getLogger(CourseRetriever.class);
 
     public static void main(String[] args) {
-        System.out.println("Hello, welcome to the Course Retriever!");
-        if(args.length == 0) {
-            System.out.println("Please provide a course ID as an argument.");
+        LOG.info("Hello, welcome to the Course Retriever!");
+        if (args == null || args.length < 2) {
+            LOG.warn("Usage: CourseRetriever <courseId> <authorId>");
             return;
         }
 
         try {
-            retrieveCourse(args[0]);
+            retrieveCourse(args[0], args[1]);
         } catch (Exception e) {
-            System.out.println("An error occurred while retrieving the course information: " + e.getMessage());
-            e.printStackTrace();
+            LOG.error("An error occurred while retrieving the course information", e);
         }
     }
 
-    private static void retrieveCourse(String courseId) {
-        System.out.println("Retrieving information for course ID: " + courseId);
+    private static void retrieveCourse(String courseId, String authorId) {
+        LOG.info("Retrieving information for course ID: '{}'", courseId);
+        LOG.info("Retrieving author for course ID: '{}'", authorId);
+        CourseRetrievalService courseRetrievalService = new CourseRetrievalService();
+
+        String coursesToStore = courseRetrievalService.getCoursesFor(authorId);
+        LOG.info("Courses retrieved for author ID '{}': {}", authorId, coursesToStore);
     }
 }
